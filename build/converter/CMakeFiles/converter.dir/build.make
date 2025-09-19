@@ -76,57 +76,57 @@ converter/CMakeFiles/converter.dir/src/main.cpp.o: converter/CMakeFiles/converte
 converter/CMakeFiles/converter.dir/src/main.cpp.o: /Users/borovinsky.in/dev/LoxxCore/converter/src/main.cpp
 converter/CMakeFiles/converter.dir/src/main.cpp.o: converter/CMakeFiles/converter.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/borovinsky.in/dev/LoxxCore/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object converter/CMakeFiles/converter.dir/src/main.cpp.o"
-	cd /Users/borovinsky.in/dev/LoxxCore/build/converter && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT converter/CMakeFiles/converter.dir/src/main.cpp.o -MF CMakeFiles/converter.dir/src/main.cpp.o.d -o CMakeFiles/converter.dir/src/main.cpp.o -c /Users/borovinsky.in/dev/LoxxCore/converter/src/main.cpp
+	cd /Users/borovinsky.in/dev/LoxxCore/build/converter && /usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT converter/CMakeFiles/converter.dir/src/main.cpp.o -MF CMakeFiles/converter.dir/src/main.cpp.o.d -o CMakeFiles/converter.dir/src/main.cpp.o -c /Users/borovinsky.in/dev/LoxxCore/converter/src/main.cpp
 
 converter/CMakeFiles/converter.dir/src/main.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/converter.dir/src/main.cpp.i"
-	cd /Users/borovinsky.in/dev/LoxxCore/build/converter && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/borovinsky.in/dev/LoxxCore/converter/src/main.cpp > CMakeFiles/converter.dir/src/main.cpp.i
+	cd /Users/borovinsky.in/dev/LoxxCore/build/converter && /usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/borovinsky.in/dev/LoxxCore/converter/src/main.cpp > CMakeFiles/converter.dir/src/main.cpp.i
 
 converter/CMakeFiles/converter.dir/src/main.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/converter.dir/src/main.cpp.s"
-	cd /Users/borovinsky.in/dev/LoxxCore/build/converter && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/borovinsky.in/dev/LoxxCore/converter/src/main.cpp -o CMakeFiles/converter.dir/src/main.cpp.s
+	cd /Users/borovinsky.in/dev/LoxxCore/build/converter && /usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/borovinsky.in/dev/LoxxCore/converter/src/main.cpp -o CMakeFiles/converter.dir/src/main.cpp.s
 
 converter/CMakeFiles/converter.dir/src/sqlite_writer.cpp.o: converter/CMakeFiles/converter.dir/flags.make
 converter/CMakeFiles/converter.dir/src/sqlite_writer.cpp.o: /Users/borovinsky.in/dev/LoxxCore/converter/src/sqlite_writer.cpp
 converter/CMakeFiles/converter.dir/src/sqlite_writer.cpp.o: converter/CMakeFiles/converter.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/borovinsky.in/dev/LoxxCore/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object converter/CMakeFiles/converter.dir/src/sqlite_writer.cpp.o"
-	cd /Users/borovinsky.in/dev/LoxxCore/build/converter && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT converter/CMakeFiles/converter.dir/src/sqlite_writer.cpp.o -MF CMakeFiles/converter.dir/src/sqlite_writer.cpp.o.d -o CMakeFiles/converter.dir/src/sqlite_writer.cpp.o -c /Users/borovinsky.in/dev/LoxxCore/converter/src/sqlite_writer.cpp
+	cd /Users/borovinsky.in/dev/LoxxCore/build/converter && /usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT converter/CMakeFiles/converter.dir/src/sqlite_writer.cpp.o -MF CMakeFiles/converter.dir/src/sqlite_writer.cpp.o.d -o CMakeFiles/converter.dir/src/sqlite_writer.cpp.o -c /Users/borovinsky.in/dev/LoxxCore/converter/src/sqlite_writer.cpp
 
 converter/CMakeFiles/converter.dir/src/sqlite_writer.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/converter.dir/src/sqlite_writer.cpp.i"
-	cd /Users/borovinsky.in/dev/LoxxCore/build/converter && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/borovinsky.in/dev/LoxxCore/converter/src/sqlite_writer.cpp > CMakeFiles/converter.dir/src/sqlite_writer.cpp.i
+	cd /Users/borovinsky.in/dev/LoxxCore/build/converter && /usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/borovinsky.in/dev/LoxxCore/converter/src/sqlite_writer.cpp > CMakeFiles/converter.dir/src/sqlite_writer.cpp.i
 
 converter/CMakeFiles/converter.dir/src/sqlite_writer.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/converter.dir/src/sqlite_writer.cpp.s"
-	cd /Users/borovinsky.in/dev/LoxxCore/build/converter && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/borovinsky.in/dev/LoxxCore/converter/src/sqlite_writer.cpp -o CMakeFiles/converter.dir/src/sqlite_writer.cpp.s
+	cd /Users/borovinsky.in/dev/LoxxCore/build/converter && /usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/borovinsky.in/dev/LoxxCore/converter/src/sqlite_writer.cpp -o CMakeFiles/converter.dir/src/sqlite_writer.cpp.s
 
 converter/CMakeFiles/converter.dir/src/pbf_reader.cpp.o: converter/CMakeFiles/converter.dir/flags.make
 converter/CMakeFiles/converter.dir/src/pbf_reader.cpp.o: /Users/borovinsky.in/dev/LoxxCore/converter/src/pbf_reader.cpp
 converter/CMakeFiles/converter.dir/src/pbf_reader.cpp.o: converter/CMakeFiles/converter.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/borovinsky.in/dev/LoxxCore/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object converter/CMakeFiles/converter.dir/src/pbf_reader.cpp.o"
-	cd /Users/borovinsky.in/dev/LoxxCore/build/converter && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT converter/CMakeFiles/converter.dir/src/pbf_reader.cpp.o -MF CMakeFiles/converter.dir/src/pbf_reader.cpp.o.d -o CMakeFiles/converter.dir/src/pbf_reader.cpp.o -c /Users/borovinsky.in/dev/LoxxCore/converter/src/pbf_reader.cpp
+	cd /Users/borovinsky.in/dev/LoxxCore/build/converter && /usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT converter/CMakeFiles/converter.dir/src/pbf_reader.cpp.o -MF CMakeFiles/converter.dir/src/pbf_reader.cpp.o.d -o CMakeFiles/converter.dir/src/pbf_reader.cpp.o -c /Users/borovinsky.in/dev/LoxxCore/converter/src/pbf_reader.cpp
 
 converter/CMakeFiles/converter.dir/src/pbf_reader.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/converter.dir/src/pbf_reader.cpp.i"
-	cd /Users/borovinsky.in/dev/LoxxCore/build/converter && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/borovinsky.in/dev/LoxxCore/converter/src/pbf_reader.cpp > CMakeFiles/converter.dir/src/pbf_reader.cpp.i
+	cd /Users/borovinsky.in/dev/LoxxCore/build/converter && /usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/borovinsky.in/dev/LoxxCore/converter/src/pbf_reader.cpp > CMakeFiles/converter.dir/src/pbf_reader.cpp.i
 
 converter/CMakeFiles/converter.dir/src/pbf_reader.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/converter.dir/src/pbf_reader.cpp.s"
-	cd /Users/borovinsky.in/dev/LoxxCore/build/converter && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/borovinsky.in/dev/LoxxCore/converter/src/pbf_reader.cpp -o CMakeFiles/converter.dir/src/pbf_reader.cpp.s
+	cd /Users/borovinsky.in/dev/LoxxCore/build/converter && /usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/borovinsky.in/dev/LoxxCore/converter/src/pbf_reader.cpp -o CMakeFiles/converter.dir/src/pbf_reader.cpp.s
 
 converter/CMakeFiles/converter.dir/src/serializer.cpp.o: converter/CMakeFiles/converter.dir/flags.make
 converter/CMakeFiles/converter.dir/src/serializer.cpp.o: /Users/borovinsky.in/dev/LoxxCore/converter/src/serializer.cpp
 converter/CMakeFiles/converter.dir/src/serializer.cpp.o: converter/CMakeFiles/converter.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/borovinsky.in/dev/LoxxCore/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object converter/CMakeFiles/converter.dir/src/serializer.cpp.o"
-	cd /Users/borovinsky.in/dev/LoxxCore/build/converter && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT converter/CMakeFiles/converter.dir/src/serializer.cpp.o -MF CMakeFiles/converter.dir/src/serializer.cpp.o.d -o CMakeFiles/converter.dir/src/serializer.cpp.o -c /Users/borovinsky.in/dev/LoxxCore/converter/src/serializer.cpp
+	cd /Users/borovinsky.in/dev/LoxxCore/build/converter && /usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT converter/CMakeFiles/converter.dir/src/serializer.cpp.o -MF CMakeFiles/converter.dir/src/serializer.cpp.o.d -o CMakeFiles/converter.dir/src/serializer.cpp.o -c /Users/borovinsky.in/dev/LoxxCore/converter/src/serializer.cpp
 
 converter/CMakeFiles/converter.dir/src/serializer.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/converter.dir/src/serializer.cpp.i"
-	cd /Users/borovinsky.in/dev/LoxxCore/build/converter && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/borovinsky.in/dev/LoxxCore/converter/src/serializer.cpp > CMakeFiles/converter.dir/src/serializer.cpp.i
+	cd /Users/borovinsky.in/dev/LoxxCore/build/converter && /usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/borovinsky.in/dev/LoxxCore/converter/src/serializer.cpp > CMakeFiles/converter.dir/src/serializer.cpp.i
 
 converter/CMakeFiles/converter.dir/src/serializer.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/converter.dir/src/serializer.cpp.s"
-	cd /Users/borovinsky.in/dev/LoxxCore/build/converter && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/borovinsky.in/dev/LoxxCore/converter/src/serializer.cpp -o CMakeFiles/converter.dir/src/serializer.cpp.s
+	cd /Users/borovinsky.in/dev/LoxxCore/build/converter && /usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/borovinsky.in/dev/LoxxCore/converter/src/serializer.cpp -o CMakeFiles/converter.dir/src/serializer.cpp.s
 
 # Object files for target converter
 converter_OBJECTS = \
@@ -148,6 +148,7 @@ converter/converter: /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX
 converter/converter: /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib/libbz2.tbd
 converter/converter: /opt/homebrew/lib/liblz4.dylib
 converter/converter: /opt/homebrew/lib/libzstd.dylib
+converter/converter: /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib/libexpat.tbd
 converter/converter: converter/CMakeFiles/converter.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/Users/borovinsky.in/dev/LoxxCore/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Linking CXX executable converter"
 	cd /Users/borovinsky.in/dev/LoxxCore/build/converter && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/converter.dir/link.txt --verbose=$(VERBOSE)

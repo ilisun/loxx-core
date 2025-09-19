@@ -47,6 +47,9 @@ int main(int argc, char** argv) {
     if (outPath.has_parent_path()) {
       fs::create_directories(outPath.parent_path());
     }
+    if (fs::exists(outPath)) {
+      fs::remove(outPath);
+    }
 
     RoutingDbWriter writer(outputDbPath);
     writer.createSchemaIfNeeded();

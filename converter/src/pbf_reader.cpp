@@ -30,9 +30,9 @@ std::unordered_map<long long, TileData> PbfReader::readAndTile() {
 
   // Первый проход: собрать узлы
   while (osmium::memory::Buffer buffer = reader.read()) {
-    for (const osmium::OSMObject& obj : buffer) {
-      if (obj.type() == osmium::item_type::node) {
-        const auto& n = static_cast<const osmium::Node&>(obj);
+    for (const osmium::OSMEntity& entity : buffer) {
+      if (entity.type() == osmium::item_type::node) {
+        const auto& n = static_cast<const osmium::Node&>(entity);
         SimpleNode sn{n.id(), n.location().lat(), n.location().lon()};
         node_index[sn.id] = sn;
       }
@@ -43,9 +43,9 @@ std::unordered_map<long long, TileData> PbfReader::readAndTile() {
   // Второй проход: собрать ways c highway=*
   osmium::io::Reader reader2{input_path_};
   while (osmium::memory::Buffer buffer = reader2.read()) {
-    for (const osmium::OSMObject& obj : buffer) {
-      if (obj.type() == osmium::item_type::way) {
-        const auto& w = static_cast<const osmium::Way&>(obj);
+    for (const osmium::OSMEntity& entity : buffer) {
+      if (entity.type() == osmium::item_type::way) {
+        const auto& w = static_cast<const osmium::Way&>(entity);
         const char* highway = w.tags().get_value_by_key("highway");
         if (!highway) continue;
 

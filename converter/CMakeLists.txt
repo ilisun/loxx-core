@@ -4,12 +4,11 @@ project(converter LANGUAGES CXX)
 
 find_package(SQLite3 REQUIRED)
 
-# libosmium (header-only) + protozero via pkg-config
-find_package(PkgConfig QUIET)
-if(PKG_CONFIG_FOUND)
-  pkg_check_modules(LIBOSMIUM QUIET libosmium)
-  pkg_check_modules(PROTOZERO QUIET protozero)
-endif()
+# libosmium/protozero headers (Homebrew installs headers only)
+find_path(OSMIUM_INCLUDE_DIR osmium/io/any_input.hpp
+  PATHS /opt/homebrew/include /usr/local/include)
+find_path(PROTOZERO_INCLUDE_DIR protozero/byteswap.hpp
+  PATHS /opt/homebrew/include /usr/local/include)
 
 # FlatBuffers codegen (requires flatc available at configure/build time)
 find_program(FLATC_EXECUTABLE NAMES flatc)
@@ -46,12 +45,12 @@ if(FLATC_EXECUTABLE)
     target_include_directories(converter PRIVATE ${FLATBUFFERS_INCLUDE_DIR})
   endif()
 endif()
-if(LIBOSMIUM_FOUND)
-  target_include_directories(converter PRIVATE ${LIBOSMIUM_INCLUDE_DIRS})
+if(OSMIUM_INCLUDE_DIR)
+  target_include_directories(converter PRIVATE ${OSMIUM_INCLUDE_DIR})
   target_compile_definitions(converter PRIVATE HAVE_LIBOSMIUM=1)
 endif()
-if(PROTOZERO_FOUND)
-  target_include_directories(converter PRIVATE ${PROTOZERO_INCLUDE_DIRS})
+if(PROTOZERO_INCLUDE_DIR)
+  target_include_directories(converter PRIVATE ${PROTOZERO_INCLUDE_DIR})
 endif()
 
 # Link SQLite with compatibility for environments where imported target is missing
@@ -78,6 +77,12 @@ endif()
 find_library(ZSTD_LIB zstd)
 if(ZSTD_LIB)
   target_link_libraries(converter PRIVATE ${ZSTD_LIB})
+endif()
+
+# Expat (XML) is pulled by libosmium headers; needed at link time even for PBF builds
+find_library(EXPAT_LIB expat)
+if(EXPAT_LIB)
+  target_link_libraries(converter PRIVATE ${EXPAT_LIB})
 endif()
 
 if(TARGET generate_flatbuffers)
