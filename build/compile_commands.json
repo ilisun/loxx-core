@@ -1,0 +1,44 @@
+[
+{
+  "directory": "/Users/borovinsky.in/dev/LoxxCore/build/core",
+  "command": "/usr/bin/clang++  -I/Users/borovinsky.in/dev/LoxxCore/core/include -I/Users/borovinsky.in/dev/LoxxCore/build/core/generated -I/opt/homebrew/include -g -std=c++20 -arch arm64 -o CMakeFiles/routing_core.dir/src/router.cpp.o -c /Users/borovinsky.in/dev/LoxxCore/core/src/router.cpp",
+  "file": "/Users/borovinsky.in/dev/LoxxCore/core/src/router.cpp",
+  "output": "core/CMakeFiles/routing_core.dir/src/router.cpp.o"
+},
+{
+  "directory": "/Users/borovinsky.in/dev/LoxxCore/build/core",
+  "command": "/usr/bin/clang++  -I/Users/borovinsky.in/dev/LoxxCore/core/include -I/Users/borovinsky.in/dev/LoxxCore/build/core/generated -I/opt/homebrew/include -g -std=c++20 -arch arm64 -o CMakeFiles/routing_core.dir/src/tile_store.cpp.o -c /Users/borovinsky.in/dev/LoxxCore/core/src/tile_store.cpp",
+  "file": "/Users/borovinsky.in/dev/LoxxCore/core/src/tile_store.cpp",
+  "output": "core/CMakeFiles/routing_core.dir/src/tile_store.cpp.o"
+},
+{
+  "directory": "/Users/borovinsky.in/dev/LoxxCore/build/core",
+  "command": "/usr/bin/clang++  -I/Users/borovinsky.in/dev/LoxxCore/core/include -g -std=c++20 -arch arm64 -o CMakeFiles/route_demo.dir/examples/route_demo.cpp.o -c /Users/borovinsky.in/dev/LoxxCore/core/examples/route_demo.cpp",
+  "file": "/Users/borovinsky.in/dev/LoxxCore/core/examples/route_demo.cpp",
+  "output": "core/CMakeFiles/route_demo.dir/examples/route_demo.cpp.o"
+},
+{
+  "directory": "/Users/borovinsky.in/dev/LoxxCore/build/converter",
+  "command": "/usr/bin/clang++ -DHAVE_LIBOSMIUM=1 -I/Users/borovinsky.in/dev/LoxxCore/converter/src -I/Users/borovinsky.in/dev/LoxxCore/build/converter/generated -I/opt/homebrew/include -g -std=c++20 -arch arm64 -o CMakeFiles/converter.dir/src/main.cpp.o -c /Users/borovinsky.in/dev/LoxxCore/converter/src/main.cpp",
+  "file": "/Users/borovinsky.in/dev/LoxxCore/converter/src/main.cpp",
+  "output": "converter/CMakeFiles/converter.dir/src/main.cpp.o"
+},
+{
+  "directory": "/Users/borovinsky.in/dev/LoxxCore/build/converter",
+  "command": "/usr/bin/clang++ -DHAVE_LIBOSMIUM=1 -I/Users/borovinsky.in/dev/LoxxCore/converter/src -I/Users/borovinsky.in/dev/LoxxCore/build/converter/generated -I/opt/homebrew/include -g -std=c++20 -arch arm64 -o CMakeFiles/converter.dir/src/sqlite_writer.cpp.o -c /Users/borovinsky.in/dev/LoxxCore/converter/src/sqlite_writer.cpp",
+  "file": "/Users/borovinsky.in/dev/LoxxCore/converter/src/sqlite_writer.cpp",
+  "output": "converter/CMakeFiles/converter.dir/src/sqlite_writer.cpp.o"
+},
+{
+  "directory": "/Users/borovinsky.in/dev/LoxxCore/build/converter",
+  "command": "/usr/bin/clang++ -DHAVE_LIBOSMIUM=1 -I/Users/borovinsky.in/dev/LoxxCore/converter/src -I/Users/borovinsky.in/dev/LoxxCore/build/converter/generated -I/opt/homebrew/include -g -std=c++20 -arch arm64 -o CMakeFiles/converter.dir/src/pbf_reader.cpp.o -c /Users/borovinsky.in/dev/LoxxCore/converter/src/pbf_reader.cpp",
+  "file": "/Users/borovinsky.in/dev/LoxxCore/converter/src/pbf_reader.cpp",
+  "output": "converter/CMakeFiles/converter.dir/src/pbf_reader.cpp.o"
+},
+{
+  "directory": "/Users/borovinsky.in/dev/LoxxCore/build/converter",
+  "command": "/usr/bin/clang++ -DHAVE_LIBOSMIUM=1 -I/Users/borovinsky.in/dev/LoxxCore/converter/src -I/Users/borovinsky.in/dev/LoxxCore/build/converter/generated -I/opt/homebrew/include -g -std=c++20 -arch arm64 -o CMakeFiles/converter.dir/src/serializer.cpp.o -c /Users/borovinsky.in/dev/LoxxCore/converter/src/serializer.cpp",
+  "file": "/Users/borovinsky.in/dev/LoxxCore/converter/src/serializer.cpp",
+  "output": "converter/CMakeFiles/converter.dir/src/serializer.cpp.o"
+}
+]

@@ -1,0 +1,150 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"childIndexes" : 
+					[
+						1,
+						2
+					],
+					"jsonFile" : "directory-.-Debug-f5ebdc15457944623624.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.20"
+					},
+					"projectIndex" : 0,
+					"source" : "."
+				},
+				{
+					"build" : "core",
+					"jsonFile" : "directory-core-Debug-eac7e466be7743a8be0a.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.20"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 1,
+					"source" : "core",
+					"targetIndexes" : 
+					[
+						1,
+						3,
+						4
+					]
+				},
+				{
+					"build" : "converter",
+					"jsonFile" : "directory-converter-Debug-c1e086b83f0d35446793.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.20"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 2,
+					"source" : "converter",
+					"targetIndexes" : 
+					[
+						0,
+						2
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"childIndexes" : 
+					[
+						1,
+						2
+					],
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "LoxxCore"
+				},
+				{
+					"directoryIndexes" : 
+					[
+						1
+					],
+					"name" : "routing_core",
+					"parentIndex" : 0,
+					"targetIndexes" : 
+					[
+						1,
+						3,
+						4
+					]
+				},
+				{
+					"directoryIndexes" : 
+					[
+						2
+					],
+					"name" : "converter",
+					"parentIndex" : 0,
+					"targetIndexes" : 
+					[
+						0,
+						2
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 2,
+					"id" : "converter::@d452e21cdee5435450b6",
+					"jsonFile" : "target-converter-Debug-c4707e14364f3699b555.json",
+					"name" : "converter",
+					"projectIndex" : 2
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "core_generate_fbs::@57760688d1f824db5d9c",
+					"jsonFile" : "target-core_generate_fbs-Debug-22bdba714aba90f1173a.json",
+					"name" : "core_generate_fbs",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 2,
+					"id" : "generate_flatbuffers::@d452e21cdee5435450b6",
+					"jsonFile" : "target-generate_flatbuffers-Debug-a2cf374d9b3b1e6a2aea.json",
+					"name" : "generate_flatbuffers",
+					"projectIndex" : 2
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "route_demo::@57760688d1f824db5d9c",
+					"jsonFile" : "target-route_demo-Debug-bb4d305cfb5a2531b2f7.json",
+					"name" : "route_demo",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "routing_core::@57760688d1f824db5d9c",
+					"jsonFile" : "target-routing_core-Debug-7c65c0525085994e8bac.json",
+					"name" : "routing_core",
+					"projectIndex" : 1
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "/Users/borovinsky.in/dev/LoxxCore/build",
+		"source" : "/Users/borovinsky.in/dev/LoxxCore"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 8
+	}
+}

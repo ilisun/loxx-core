@@ -11,6 +11,7 @@ set(CMAKE_MAKEFILE_DEPENDS
   "CMakeFiles/4.1.1/CMakeCXXCompiler.cmake"
   "CMakeFiles/4.1.1/CMakeSystem.cmake"
   "/Users/borovinsky.in/dev/LoxxCore/converter/CMakeLists.txt"
+  "/Users/borovinsky.in/dev/LoxxCore/core/CMakeLists.txt"
   "/opt/homebrew/share/cmake/Modules/CMakeCXXInformation.cmake"
   "/opt/homebrew/share/cmake/Modules/CMakeCommonLanguageInclude.cmake"
   "/opt/homebrew/share/cmake/Modules/CMakeGenericSystem.cmake"
@@ -49,11 +50,15 @@ set(CMAKE_MAKEFILE_OUTPUTS
 # Byproducts of CMake generate step:
 set(CMAKE_MAKEFILE_PRODUCTS
   "CMakeFiles/CMakeDirectoryInformation.cmake"
+  "core/CMakeFiles/CMakeDirectoryInformation.cmake"
   "converter/CMakeFiles/CMakeDirectoryInformation.cmake"
   )
 
 # Dependency information for all targets:
 set(CMAKE_DEPEND_INFO_FILES
+  "core/CMakeFiles/routing_core.dir/DependInfo.cmake"
+  "core/CMakeFiles/core_generate_fbs.dir/DependInfo.cmake"
+  "core/CMakeFiles/route_demo.dir/DependInfo.cmake"
   "converter/CMakeFiles/generate_flatbuffers.dir/DependInfo.cmake"
   "converter/CMakeFiles/converter.dir/DependInfo.cmake"
   )

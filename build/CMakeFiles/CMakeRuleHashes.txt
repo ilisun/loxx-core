@@ -1,3 +1,5 @@
 # Hashes of file build rules.
 885cd8ac3b8a832eebbac25ad22c3d66 converter/CMakeFiles/generate_flatbuffers
 885e410719d1909632b02b9d51a5861a converter/generated/land_tile_generated.h
+b5416f7848a54f61403f7d59eeaee6b9 core/CMakeFiles/core_generate_fbs
+c19526d6e21ecfd1103714b645d8bc1c core/generated/land_tile_generated.h

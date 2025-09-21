@@ -282,7 +282,7 @@ cmake -S . -B build \
 - Запуск и проверка
 
 ```bash
-cd /Users/borovinsky.in/dev/LoxxCore
+cd ~/dev/LoxxCore
 cmake -S . -B build
 cmake --build build -j 4
 ```

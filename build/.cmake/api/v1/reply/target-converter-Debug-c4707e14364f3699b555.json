@@ -99,7 +99,7 @@
 			"compileCommandFragments" : 
 			[
 				{
-					"fragment" : "-std=c++20 -arch arm64"
+					"fragment" : "-g -std=c++20 -arch arm64"
 				}
 			],
 			"defines" : 
@@ -154,6 +154,10 @@
 	{
 		"commandFragments" : 
 		[
+			{
+				"fragment" : "-g",
+				"role" : "flags"
+			},
 			{
 				"fragment" : "-Wl,-search_paths_first -Wl,-headerpad_max_install_names",
 				"role" : "flags"

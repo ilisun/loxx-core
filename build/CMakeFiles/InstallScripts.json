@@ -2,6 +2,7 @@
 	"InstallScripts" : 
 	[
 		"/Users/borovinsky.in/dev/LoxxCore/build/cmake_install.cmake",
+		"/Users/borovinsky.in/dev/LoxxCore/build/core/cmake_install.cmake",
 		"/Users/borovinsky.in/dev/LoxxCore/build/converter/cmake_install.cmake"
 	],
 	"Parallel" : false

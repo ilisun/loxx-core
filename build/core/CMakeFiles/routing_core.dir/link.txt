@@ -1,0 +1,2 @@
+/usr/bin/ar qc librouting_core.a CMakeFiles/routing_core.dir/src/router.cpp.o CMakeFiles/routing_core.dir/src/tile_store.cpp.o
+/usr/bin/ranlib librouting_core.a

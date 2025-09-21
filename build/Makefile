@@ -117,6 +117,45 @@ depend:
 .PHONY : depend
 
 #=============================================================================
+# Target rules for targets named routing_core
+
+# Build rule for target.
+routing_core: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 routing_core
+.PHONY : routing_core
+
+# fast build rule for target.
+routing_core/fast:
+	$(MAKE) $(MAKESILENT) -f core/CMakeFiles/routing_core.dir/build.make core/CMakeFiles/routing_core.dir/build
+.PHONY : routing_core/fast
+
+#=============================================================================
+# Target rules for targets named core_generate_fbs
+
+# Build rule for target.
+core_generate_fbs: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 core_generate_fbs
+.PHONY : core_generate_fbs
+
+# fast build rule for target.
+core_generate_fbs/fast:
+	$(MAKE) $(MAKESILENT) -f core/CMakeFiles/core_generate_fbs.dir/build.make core/CMakeFiles/core_generate_fbs.dir/build
+.PHONY : core_generate_fbs/fast
+
+#=============================================================================
+# Target rules for targets named route_demo
+
+# Build rule for target.
+route_demo: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 route_demo
+.PHONY : route_demo
+
+# fast build rule for target.
+route_demo/fast:
+	$(MAKE) $(MAKESILENT) -f core/CMakeFiles/route_demo.dir/build.make core/CMakeFiles/route_demo.dir/build
+.PHONY : route_demo/fast
+
+#=============================================================================
 # Target rules for targets named generate_flatbuffers
 
 # Build rule for target.
@@ -150,8 +189,11 @@ help:
 	@echo "... depend"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
+	@echo "... core_generate_fbs"
 	@echo "... generate_flatbuffers"
 	@echo "... converter"
+	@echo "... route_demo"
+	@echo "... routing_core"
 .PHONY : help
 
 

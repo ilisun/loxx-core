@@ -63,18 +63,22 @@ CMAKE_BINARY_DIR = /Users/borovinsky.in/dev/LoxxCore/build
 # Directory level rules for the build root directory
 
 # The main recursive "all" target.
+all: core/all
 all: converter/all
 .PHONY : all
 
 # The main recursive "codegen" target.
+codegen: core/codegen
 codegen: converter/codegen
 .PHONY : codegen
 
 # The main recursive "preinstall" target.
+preinstall: core/preinstall
 preinstall: converter/preinstall
 .PHONY : preinstall
 
 # The main recursive "clean" target.
+clean: core/clean
 clean: converter/clean
 .PHONY : clean
 
@@ -101,13 +105,134 @@ converter/clean: converter/CMakeFiles/converter.dir/clean
 .PHONY : converter/clean
 
 #=============================================================================
+# Directory level rules for directory core
+
+# Recursive "all" directory target.
+core/all: core/CMakeFiles/routing_core.dir/all
+core/all: core/CMakeFiles/core_generate_fbs.dir/all
+core/all: core/CMakeFiles/route_demo.dir/all
+.PHONY : core/all
+
+# Recursive "codegen" directory target.
+core/codegen: core/CMakeFiles/routing_core.dir/codegen
+core/codegen: core/CMakeFiles/core_generate_fbs.dir/codegen
+core/codegen: core/CMakeFiles/route_demo.dir/codegen
+.PHONY : core/codegen
+
+# Recursive "preinstall" directory target.
+core/preinstall:
+.PHONY : core/preinstall
+
+# Recursive "clean" directory target.
+core/clean: core/CMakeFiles/routing_core.dir/clean
+core/clean: core/CMakeFiles/core_generate_fbs.dir/clean
+core/clean: core/CMakeFiles/route_demo.dir/clean
+.PHONY : core/clean
+
+#=============================================================================
+# Target rules for target core/CMakeFiles/routing_core.dir
+
+# All Build rule for target.
+core/CMakeFiles/routing_core.dir/all: core/CMakeFiles/core_generate_fbs.dir/all
+	$(MAKE) $(MAKESILENT) -f core/CMakeFiles/routing_core.dir/build.make core/CMakeFiles/routing_core.dir/depend
+	$(MAKE) $(MAKESILENT) -f core/CMakeFiles/routing_core.dir/build.make core/CMakeFiles/routing_core.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/borovinsky.in/dev/LoxxCore/build/CMakeFiles --progress-num=10,11,12 "Built target routing_core"
+.PHONY : core/CMakeFiles/routing_core.dir/all
+
+# Build rule for subdir invocation for target.
+core/CMakeFiles/routing_core.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/borovinsky.in/dev/LoxxCore/build/CMakeFiles 4
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 core/CMakeFiles/routing_core.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/borovinsky.in/dev/LoxxCore/build/CMakeFiles 0
+.PHONY : core/CMakeFiles/routing_core.dir/rule
+
+# Convenience name for target.
+routing_core: core/CMakeFiles/routing_core.dir/rule
+.PHONY : routing_core
+
+# codegen rule for target.
+core/CMakeFiles/routing_core.dir/codegen: core/CMakeFiles/core_generate_fbs.dir/all
+	$(MAKE) $(MAKESILENT) -f core/CMakeFiles/routing_core.dir/build.make core/CMakeFiles/routing_core.dir/codegen
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/borovinsky.in/dev/LoxxCore/build/CMakeFiles --progress-num=10,11,12 "Finished codegen for target routing_core"
+.PHONY : core/CMakeFiles/routing_core.dir/codegen
+
+# clean rule for target.
+core/CMakeFiles/routing_core.dir/clean:
+	$(MAKE) $(MAKESILENT) -f core/CMakeFiles/routing_core.dir/build.make core/CMakeFiles/routing_core.dir/clean
+.PHONY : core/CMakeFiles/routing_core.dir/clean
+
+#=============================================================================
+# Target rules for target core/CMakeFiles/core_generate_fbs.dir
+
+# All Build rule for target.
+core/CMakeFiles/core_generate_fbs.dir/all:
+	$(MAKE) $(MAKESILENT) -f core/CMakeFiles/core_generate_fbs.dir/build.make core/CMakeFiles/core_generate_fbs.dir/depend
+	$(MAKE) $(MAKESILENT) -f core/CMakeFiles/core_generate_fbs.dir/build.make core/CMakeFiles/core_generate_fbs.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/borovinsky.in/dev/LoxxCore/build/CMakeFiles --progress-num=6 "Built target core_generate_fbs"
+.PHONY : core/CMakeFiles/core_generate_fbs.dir/all
+
+# Build rule for subdir invocation for target.
+core/CMakeFiles/core_generate_fbs.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/borovinsky.in/dev/LoxxCore/build/CMakeFiles 1
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 core/CMakeFiles/core_generate_fbs.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/borovinsky.in/dev/LoxxCore/build/CMakeFiles 0
+.PHONY : core/CMakeFiles/core_generate_fbs.dir/rule
+
+# Convenience name for target.
+core_generate_fbs: core/CMakeFiles/core_generate_fbs.dir/rule
+.PHONY : core_generate_fbs
+
+# codegen rule for target.
+core/CMakeFiles/core_generate_fbs.dir/codegen:
+	$(MAKE) $(MAKESILENT) -f core/CMakeFiles/core_generate_fbs.dir/build.make core/CMakeFiles/core_generate_fbs.dir/codegen
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/borovinsky.in/dev/LoxxCore/build/CMakeFiles --progress-num=6 "Finished codegen for target core_generate_fbs"
+.PHONY : core/CMakeFiles/core_generate_fbs.dir/codegen
+
+# clean rule for target.
+core/CMakeFiles/core_generate_fbs.dir/clean:
+	$(MAKE) $(MAKESILENT) -f core/CMakeFiles/core_generate_fbs.dir/build.make core/CMakeFiles/core_generate_fbs.dir/clean
+.PHONY : core/CMakeFiles/core_generate_fbs.dir/clean
+
+#=============================================================================
+# Target rules for target core/CMakeFiles/route_demo.dir
+
+# All Build rule for target.
+core/CMakeFiles/route_demo.dir/all: core/CMakeFiles/routing_core.dir/all
+	$(MAKE) $(MAKESILENT) -f core/CMakeFiles/route_demo.dir/build.make core/CMakeFiles/route_demo.dir/depend
+	$(MAKE) $(MAKESILENT) -f core/CMakeFiles/route_demo.dir/build.make core/CMakeFiles/route_demo.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/borovinsky.in/dev/LoxxCore/build/CMakeFiles --progress-num=8,9 "Built target route_demo"
+.PHONY : core/CMakeFiles/route_demo.dir/all
+
+# Build rule for subdir invocation for target.
+core/CMakeFiles/route_demo.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/borovinsky.in/dev/LoxxCore/build/CMakeFiles 6
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 core/CMakeFiles/route_demo.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/borovinsky.in/dev/LoxxCore/build/CMakeFiles 0
+.PHONY : core/CMakeFiles/route_demo.dir/rule
+
+# Convenience name for target.
+route_demo: core/CMakeFiles/route_demo.dir/rule
+.PHONY : route_demo
+
+# codegen rule for target.
+core/CMakeFiles/route_demo.dir/codegen:
+	$(MAKE) $(MAKESILENT) -f core/CMakeFiles/route_demo.dir/build.make core/CMakeFiles/route_demo.dir/codegen
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/borovinsky.in/dev/LoxxCore/build/CMakeFiles --progress-num=8,9 "Finished codegen for target route_demo"
+.PHONY : core/CMakeFiles/route_demo.dir/codegen
+
+# clean rule for target.
+core/CMakeFiles/route_demo.dir/clean:
+	$(MAKE) $(MAKESILENT) -f core/CMakeFiles/route_demo.dir/build.make core/CMakeFiles/route_demo.dir/clean
+.PHONY : core/CMakeFiles/route_demo.dir/clean
+
+#=============================================================================
 # Target rules for target converter/CMakeFiles/generate_flatbuffers.dir
 
 # All Build rule for target.
 converter/CMakeFiles/generate_flatbuffers.dir/all:
 	$(MAKE) $(MAKESILENT) -f converter/CMakeFiles/generate_flatbuffers.dir/build.make converter/CMakeFiles/generate_flatbuffers.dir/depend
 	$(MAKE) $(MAKESILENT) -f converter/CMakeFiles/generate_flatbuffers.dir/build.make converter/CMakeFiles/generate_flatbuffers.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/borovinsky.in/dev/LoxxCore/build/CMakeFiles --progress-num=6 "Built target generate_flatbuffers"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/borovinsky.in/dev/LoxxCore/build/CMakeFiles --progress-num=7 "Built target generate_flatbuffers"
 .PHONY : converter/CMakeFiles/generate_flatbuffers.dir/all
 
 # Build rule for subdir invocation for target.
@@ -124,7 +249,7 @@ generate_flatbuffers: converter/CMakeFiles/generate_flatbuffers.dir/rule
 # codegen rule for target.
 converter/CMakeFiles/generate_flatbuffers.dir/codegen:
 	$(MAKE) $(MAKESILENT) -f converter/CMakeFiles/generate_flatbuffers.dir/build.make converter/CMakeFiles/generate_flatbuffers.dir/codegen
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/borovinsky.in/dev/LoxxCore/build/CMakeFiles --progress-num=6 "Finished codegen for target generate_flatbuffers"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/borovinsky.in/dev/LoxxCore/build/CMakeFiles --progress-num=7 "Finished codegen for target generate_flatbuffers"
 .PHONY : converter/CMakeFiles/generate_flatbuffers.dir/codegen
 
 # clean rule for target.
