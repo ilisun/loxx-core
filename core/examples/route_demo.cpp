@@ -4,6 +4,7 @@
 #include <cstdlib>
 
 #include "routing_core/router.h"
+#include "routing_core/profile.h"
 #include "routing_core/tiler.h"
 #include "routing_core/tile_store.h"
 #include "routing_core/tile_view.h"
@@ -22,14 +23,14 @@ int main(int argc, char** argv) {
   std::string db = argv[1];
   Coord a{std::stod(argv[2]), std::stod(argv[3])};
   Coord b{std::stod(argv[4]), std::stod(argv[5])};
-  Profile profile = Profile::Car;
+  auto profile = makeCarProfile();
   bool dump = false;
   int zoomOpt = 14;
   // простенький парсер дополнительных флагов
   for (int i = 6; i < argc; ++i) {
     std::string arg = argv[i];
-    if (arg == "car") profile = Profile::Car;
-    else if (arg == "foot") profile = Profile::Foot;
+    if (arg == "car") profile = makeCarProfile();
+    else if (arg == "foot") profile = makeFootProfile();
     else if (arg == "--dump") dump = true;
     else if (arg == "--z" && i+1 < argc) { zoomOpt = std::atoi(argv[++i]); }
   }

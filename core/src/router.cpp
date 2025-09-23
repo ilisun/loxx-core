@@ -16,6 +16,7 @@
 #include "routing_core/tile_view.h"
 #include "routing_core/tiler.h"
 #include "routing_core/edge_id.h"
+#include "routing_core/profile.h"
 
 namespace routing_core {
 
@@ -68,7 +69,7 @@ struct Router::Impl {
     outY = ay + t*vy;
   }
 
-  static std::optional<EdgeSnap> snapToEdge(const TileView& view, double lat, double lon, Profile profile) {
+  static std::optional<EdgeSnap> snapToEdge(const TileView& view, double lat, double lon, const ProfileSettings& profile) {
     if (!view.valid() || view.edgeCount() == 0) return std::nullopt;
     EdgeSnap best;
     bool has = false;
@@ -80,9 +81,9 @@ struct Router::Impl {
       tmp.clear();
       const auto* e = view.edgeAt(static_cast<uint32_t>(ei));
       // профильная доступность: должна быть скорость > 0 и доступен профиль
-      double sp = (profile == Profile::Car) ? e->speed_mps() : e->foot_speed_mps();
-      auto mask = e->access_mask();
-      bool allowed = (profile == Profile::Car) ? ((mask & 1) != 0) : ((mask & 2) != 0);
+      auto rc = static_cast<int>(e->road_class());
+      double sp = profile.speeds_mps[rc];
+      bool allowed = (profile.access_mask & e->access_mask()) != 0;
       if (!allowed || sp <= 0.0) continue;
       view.appendEdgeShape(static_cast<uint32_t>(ei), tmp, /*skipFirst*/false);
       if (tmp.size() < 2) continue;
@@ -114,18 +115,16 @@ struct Router::Impl {
   }
 
   // --- утилиты доступа/веса ---
-  static bool edgeAllowed(const Routing::Edge* e, Profile profile, int fromNode) {
-    auto mask = e->access_mask();
-    bool carOk  = (profile == Profile::Car)  && (mask & 1);
-    bool footOk = (profile == Profile::Foot) && (mask & 2);
-    if (!carOk && !footOk) return false;
+  static bool edgeAllowed(const Routing::Edge* e, const ProfileSettings& profile, int fromNode) {
+    if ((profile.access_mask & e->access_mask()) == 0) return false;
     bool oneway = e->oneway();
     if (oneway && fromNode != static_cast<int>(e->from_node())) return false;
     return true;
   }
 
-  static double edgeTraversalTimeSec(const Routing::Edge* e, Profile profile) {
-    double speed = (profile == Profile::Car) ? e->speed_mps() : e->foot_speed_mps();
+  static double edgeTraversalTimeSec(const Routing::Edge* e, const ProfileSettings& profile) {
+    auto rc = static_cast<int>(e->road_class());
+    double speed = profile.speeds_mps[rc];
     if (speed <= 0.0) return std::numeric_limits<double>::infinity();
     return e->length_m() / speed;
   }
@@ -145,7 +144,7 @@ struct Router::Impl {
   };
 
   // bi-A* внутри одного тайла + виртуальные узлы
-  RouteResult routeSingleTile(Profile profile,
+  RouteResult routeSingleTile(const ProfileSettings& profile,
                               const TileKey& key,
                               TileView& view,
                               const EdgeSnap& startSnap,
@@ -168,7 +167,8 @@ struct Router::Impl {
     auto* eEnd   = view.edgeAt(endSnap.edgeIdx);
 
     auto speedOf = [&](const Routing::Edge* e)->double {
-      return (profile == Profile::Car) ? e->speed_mps() : e->foot_speed_mps();
+      int rc = static_cast<int>(e->road_class());
+      return profile.speeds_mps[rc];
     };
 
     // длины/времена долей ребра
@@ -264,7 +264,9 @@ struct Router::Impl {
 
     std::vector<Label> F(VN), B(VN);
 
-    auto speedHeur = (profile == Profile::Car) ? 13.9 : 1.4;
+    double speedHeur = 0.0;
+    for (double v : profile.speeds_mps) { if (v > speedHeur) speedHeur = v; }
+    if (speedHeur <= 0.0) speedHeur = 1.0;
     auto h = [&](int v, const Coord& target)->double {
       double lv = (v < N) ? view.nodeLat(v) : (v == vStart ? startSnap.projLat : endSnap.projLat);
       double lo = (v < N) ? view.nodeLon(v) : (v == vStart ? startSnap.projLon : endSnap.projLon);
@@ -504,7 +506,7 @@ struct Router::Impl {
   }
 
   // Построение глобального графа из набора тайлов
-  void buildGlobalGraph(Profile profile,
+  void buildGlobalGraph(const ProfileSettings& profile,
                         const std::vector<std::pair<TileKey,TileView>>& tiles,
                         std::vector<GlobalNode>& nodes,
                         std::vector<std::vector<GlobalEdge>>& adj,
@@ -555,7 +557,7 @@ struct Router::Impl {
   }
 
   // bi-A* по глобальному графу
-  bool astarGlobalBi(const std::vector<GlobalNode>& nodes,
+bool astarGlobalBi(const std::vector<GlobalNode>& nodes,
                      const std::vector<std::vector<GlobalEdge>>& adj,
                      const std::vector<std::vector<std::pair<int,int>>>& revAdj,
                      int s, int t,
@@ -601,7 +603,7 @@ Router::Router(const std::string& db_path, RouterOptions opt)
 
 Router::~Router() = default;
 
-RouteResult Router::route(Profile profile, const std::vector<Coord>& waypoints) {
+RouteResult Router::route(const ProfileSettings& profile, const std::vector<Coord>& waypoints) {
   RouteResult rr;
   if (waypoints.size() < 2) {
     rr.status = RouteStatus::INTERNAL_ERROR;
@@ -665,7 +667,7 @@ RouteResult Router::route(Profile profile, const std::vector<Coord>& waypoints) 
 
   auto addVS = [&](const TileView& view, const Impl::EdgeSnap& snap){
     const auto* e = view.edgeAt(snap.edgeIdx);
-    double speed = (profile==Profile::Car) ? e->speed_mps() : e->foot_speed_mps();
+    double speed = profile.speeds_mps[static_cast<int>(e->road_class())];
     if (speed<=0.0) return;
     double w = e->length_m()/speed;
     double t = std::clamp(snap.t, 0.0, 1.0);
@@ -692,7 +694,7 @@ RouteResult Router::route(Profile profile, const std::vector<Coord>& waypoints) 
 
   auto addVE = [&](const TileView& view, const Impl::EdgeSnap& snap){
     const auto* e = view.edgeAt(snap.edgeIdx);
-    double speed = (profile==Profile::Car) ? e->speed_mps() : e->foot_speed_mps();
+    double speed = profile.speeds_mps[static_cast<int>(e->road_class())];
     if (speed<=0.0) return;
     double w = e->length_m()/speed;
     double t = std::clamp(snap.t, 0.0, 1.0);

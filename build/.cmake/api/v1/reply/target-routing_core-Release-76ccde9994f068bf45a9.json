@@ -50,7 +50,7 @@
 			"compileCommandFragments" : 
 			[
 				{
-					"fragment" : "-g -std=c++20 -arch arm64"
+					"fragment" : "-O3 -DNDEBUG -std=c++20 -arch arm64"
 				}
 			],
 			"includes" : 

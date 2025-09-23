@@ -920,6 +920,7 @@ core/CMakeFiles/routing_core.dir/src/router.cpp.o: /Users/borovinsky.in/dev/Loxx
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/17/include/stdint.h \
   core/generated/land_tile_generated.h \
   /Users/borovinsky.in/dev/LoxxCore/core/include/routing_core/edge_id.h \
+  /Users/borovinsky.in/dev/LoxxCore/core/include/routing_core/profile.h \
   /Users/borovinsky.in/dev/LoxxCore/core/include/routing_core/router.h \
   /Users/borovinsky.in/dev/LoxxCore/core/include/routing_core/tile_store.h \
   /Users/borovinsky.in/dev/LoxxCore/core/include/routing_core/tile_view.h \
@@ -1870,6 +1871,8 @@ core/CMakeFiles/routing_core.dir/src/tile_store.cpp.o: /Users/borovinsky.in/dev/
 /Users/borovinsky.in/dev/LoxxCore/core/include/routing_core/tiler.h:
 
 /Users/borovinsky.in/dev/LoxxCore/core/include/routing_core/router.h:
+
+/Users/borovinsky.in/dev/LoxxCore/core/include/routing_core/profile.h:
 
 /Users/borovinsky.in/dev/LoxxCore/core/include/routing_core/edge_id.h:
 

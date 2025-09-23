@@ -11,7 +11,7 @@
 						1,
 						2
 					],
-					"jsonFile" : "directory-.-Debug-f5ebdc15457944623624.json",
+					"jsonFile" : "directory-.-Release-f5ebdc15457944623624.json",
 					"minimumCMakeVersion" : 
 					{
 						"string" : "3.20"
@@ -21,7 +21,7 @@
 				},
 				{
 					"build" : "core",
-					"jsonFile" : "directory-core-Debug-eac7e466be7743a8be0a.json",
+					"jsonFile" : "directory-core-Release-eac7e466be7743a8be0a.json",
 					"minimumCMakeVersion" : 
 					{
 						"string" : "3.20"
@@ -38,7 +38,7 @@
 				},
 				{
 					"build" : "converter",
-					"jsonFile" : "directory-converter-Debug-c1e086b83f0d35446793.json",
+					"jsonFile" : "directory-converter-Release-c1e086b83f0d35446793.json",
 					"minimumCMakeVersion" : 
 					{
 						"string" : "3.20"
@@ -53,7 +53,7 @@
 					]
 				}
 			],
-			"name" : "Debug",
+			"name" : "Release",
 			"projects" : 
 			[
 				{
@@ -101,35 +101,35 @@
 				{
 					"directoryIndex" : 2,
 					"id" : "converter::@d452e21cdee5435450b6",
-					"jsonFile" : "target-converter-Debug-c4707e14364f3699b555.json",
+					"jsonFile" : "target-converter-Release-1e1505674106c00040ce.json",
 					"name" : "converter",
 					"projectIndex" : 2
 				},
 				{
 					"directoryIndex" : 1,
 					"id" : "core_generate_fbs::@57760688d1f824db5d9c",
-					"jsonFile" : "target-core_generate_fbs-Debug-2d73daccdcd6c3924707.json",
+					"jsonFile" : "target-core_generate_fbs-Release-2d73daccdcd6c3924707.json",
 					"name" : "core_generate_fbs",
 					"projectIndex" : 1
 				},
 				{
 					"directoryIndex" : 2,
 					"id" : "generate_flatbuffers::@d452e21cdee5435450b6",
-					"jsonFile" : "target-generate_flatbuffers-Debug-a2cf374d9b3b1e6a2aea.json",
+					"jsonFile" : "target-generate_flatbuffers-Release-a2cf374d9b3b1e6a2aea.json",
 					"name" : "generate_flatbuffers",
 					"projectIndex" : 2
 				},
 				{
 					"directoryIndex" : 1,
 					"id" : "route_demo::@57760688d1f824db5d9c",
-					"jsonFile" : "target-route_demo-Debug-f81b6da0ca234debdfdb.json",
+					"jsonFile" : "target-route_demo-Release-de723244d10cfe3b9d25.json",
 					"name" : "route_demo",
 					"projectIndex" : 1
 				},
 				{
 					"directoryIndex" : 1,
 					"id" : "routing_core::@57760688d1f824db5d9c",
-					"jsonFile" : "target-routing_core-Debug-6c02822d6daee76c7b45.json",
+					"jsonFile" : "target-routing_core-Release-76ccde9994f068bf45a9.json",
 					"name" : "routing_core",
 					"projectIndex" : 1
 				}

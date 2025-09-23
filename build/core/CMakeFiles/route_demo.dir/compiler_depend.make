@@ -914,6 +914,7 @@ core/CMakeFiles/route_demo.dir/examples/route_demo.cpp.o: /Users/borovinsky.in/d
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/17/include/stddef.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/17/include/stdint.h \
   core/generated/land_tile_generated.h \
+  /Users/borovinsky.in/dev/LoxxCore/core/include/routing_core/profile.h \
   /Users/borovinsky.in/dev/LoxxCore/core/include/routing_core/router.h \
   /Users/borovinsky.in/dev/LoxxCore/core/include/routing_core/tile_store.h \
   /Users/borovinsky.in/dev/LoxxCore/core/include/routing_core/tile_view.h \
@@ -955,6 +956,8 @@ core/CMakeFiles/route_demo.dir/examples/route_demo.cpp.o: /Users/borovinsky.in/d
 /Users/borovinsky.in/dev/LoxxCore/core/include/routing_core/tiler.h:
 
 /Users/borovinsky.in/dev/LoxxCore/core/include/routing_core/router.h:
+
+/Users/borovinsky.in/dev/LoxxCore/core/include/routing_core/profile.h:
 
 core/generated/land_tile_generated.h:
 

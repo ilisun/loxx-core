@@ -5,9 +5,9 @@
 #include <cstdint>
 #include <memory>
 
-namespace routing_core {
+#include "routing_core/profile.h"
 
-enum class Profile { Car, Foot };
+namespace routing_core {
 
 enum class RouteStatus {
   OK,
@@ -42,7 +42,7 @@ public:
   ~Router();
 
   // Маршрут через start..waypoints..end (в v1 — все точки в одном тайле)
-  RouteResult route(Profile profile, const std::vector<Coord>& waypoints);
+  RouteResult route(const ProfileSettings& profile, const std::vector<Coord>& waypoints);
 
 private:
   struct Impl;
