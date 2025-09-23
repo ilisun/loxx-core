@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cmath>
+#include <cstdint>
 
 namespace routing_core {
 
@@ -18,8 +19,7 @@ inline WebTileKey webTileKeyFor(double lat_deg, double lon_deg, int z) {
 
 // Кодирование edge-id на основе (z,x,y,edgeIndex)
 inline uint64_t makeEdgeId(int z, int x, int y, uint32_t edgeIdx) {
-  // 12 бит z, 20 бит x, 20 бит y, 12 бит edgeIdx (ограничение на ~4096 рёбер в тайле)
-  // При необходимости расширить схему.
+  // 12 бит z, 20 бит x, 20 бит y, 12 бит edgeIdx
   uint64_t id = 0;
   id |= (static_cast<uint64_t>(z) & 0xFFF) << 52;
   id |= (static_cast<uint64_t>(x) & 0xFFFFF) << 32;

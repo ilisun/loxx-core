@@ -9,7 +9,7 @@
 
 namespace routing_core {
 
-// Обёртка для FlatBuffers-тайла с ленивыми вспомогательными индексами.
+// Обёртка для FlatBuffers-тайла с ленивыми индексами входящих рёбер.
 class TileView {
 public:
   explicit TileView(std::shared_ptr<std::vector<uint8_t>> buffer)
@@ -56,10 +56,11 @@ public:
     return (*inAdj_)[static_cast<size_t>(nodeIdx)];
   }
 
-  // Геометрия ребра: получить список shape-точек (предпочтительно через shapes[])
-  void appendEdgeShape(uint32_t edgeIdx, std::vector<std::pair<double,double>>& out, bool skipFirst=true) const {
+  // Геометрия ребра: получить shape-точки
+  void appendEdgeShape(uint32_t edgeIdx,
+                       std::vector<std::pair<double,double>>& out,
+                       bool skipFirst=true) const {
     const auto* e = edgeAt(edgeIdx);
-    // Приоритет shapes массива
     if (root_->shapes() && e->shape_count() > 0) {
       auto start = e->shape_start();
       auto cnt   = e->shape_count();
@@ -71,36 +72,34 @@ public:
       }
       return;
     }
-    // Fallback: encoded polyline (если есть)
     if (e->encoded_polyline()) {
       decodeEncodedPolyline(e->encoded_polyline()->str(), out, skipFirst);
       return;
     }
-    // В крайнем случае — из узлов from/to (очень грубо)
+    // fallback: from→to
     int from = static_cast<int>(e->from_node());
     int to   = static_cast<int>(e->to_node());
-    if (!out.empty() && !skipFirst) out.emplace_back(nodeLat(from), nodeLon(from));
+    if (!skipFirst || out.empty()) out.emplace_back(nodeLat(from), nodeLon(from));
     out.emplace_back(nodeLat(to), nodeLon(to));
   }
 
   const Routing::LandTile* root() const { return root_; }
 
 private:
-  // Примитивный декодер polyline (Google Encoded Polyline), без Z.
   static void decodeEncodedPolyline(const std::string& s,
                                     std::vector<std::pair<double,double>>& out,
                                     bool skipFirst) {
     int index = 0, len = static_cast<int>(s.size());
     int lat = 0, lon = 0;
     bool first = true;
+    auto next = [&](int& idx)->int {
+      int result = 0, shift = 0, b = 0;
+      do { b = s[idx++] - 63; result |= (b & 0x1f) << shift; shift += 5; } while (b >= 0x20 && idx < len);
+      return ((result & 1) ? ~(result >> 1) : (result >> 1));
+    };
     while (index < len) {
-      auto next = [&]() {
-        int result = 0, shift = 0, b = 0;
-        do { b = s[index++] - 63; result |= (b & 0x1f) << shift; shift += 5; } while (b >= 0x20 && index < len);
-        return ((result & 1) ? ~(result >> 1) : (result >> 1));
-      };
-      lat += next();
-      lon += next();
+      lat += next(index);
+      lon += next(index);
       double dlat = lat * 1e-5;
       double dlon = lon * 1e-5;
       if (skipFirst && first && !out.empty()) {

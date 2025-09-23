@@ -37,10 +37,12 @@ struct Router::Impl {
     return R * c;
   }
 
-  // --- вспомогательные структуры для снапа к ребру ---
+  // --- снап к ребру ---
   struct EdgeSnap {
     uint32_t edgeIdx{0};
-    int segIndex{-1};           // индекс сегмента внутри формы ребра
+    int fromNode{-1};
+    int toNode{-1};
+    int segIndex{-1};           // индекс сегмента внутри формы (если форма есть)
     double t{0.0};              // параметр проекции на сегмент [0..1]
     double projLat{0.0};
     double projLon{0.0};
@@ -49,7 +51,7 @@ struct Router::Impl {
 
   static void projectPointToSegment(double ax, double ay, double bx, double by,
                                     double px, double py, double& outX, double& outY, double& t) {
-    // простая проекция в евклидовой метрике на плоскости WGS84 ~ ок для малых сегментов
+    // проекция в евклидовой метрике; для малых сегментов ок
     const double vx = bx - ax, vy = by - ay;
     const double wx = px - ax, wy = py - ay;
     double c1 = vx*wx + vy*wy;
@@ -59,11 +61,6 @@ struct Router::Impl {
     outY = ay + t*vy;
   }
 
-  static double segHaversine(double lat1,double lon1,double lat2,double lon2) {
-    return haversine(lat1,lon1,lat2,lon2);
-  }
-
-  // Находит ближайшую проекцию точки на форму любого ребра тайла
   static std::optional<EdgeSnap> snapToEdge(const TileView& view, double lat, double lon) {
     if (!view.valid() || view.edgeCount() == 0) return std::nullopt;
     EdgeSnap best;
@@ -77,18 +74,25 @@ struct Router::Impl {
       view.appendEdgeShape(static_cast<uint32_t>(ei), tmp, /*skipFirst*/false);
       if (tmp.size() < 2) continue;
       for (int k = 0; k+1 < static_cast<int>(tmp.size()); ++k) {
-        double px, py, t;
-        projectPointToSegment(tmp[k].first,  tmp[k].second,
-                              tmp[k+1].first, tmp[k+1].second,
-                              lat, lon, px, py, t);
-        double d = segHaversine(lat, lon, px, py);
+        // Работать в плоскости (lon=x, lat=y), затем обратно
+        double projLon, projLat, t;
+        projectPointToSegment(
+          /*ax=*/tmp[k].second,      /*ay=*/tmp[k].first,
+          /*bx=*/tmp[k+1].second,    /*by=*/tmp[k+1].first,
+          /*px=*/lon,                /*py=*/lat,
+          /*outX=*/projLon,          /*outY=*/projLat,
+          t);
+        double d = haversine(lat, lon, projLat, projLon);
         if (d < best.dist_m) {
           has = true;
           best.edgeIdx = static_cast<uint32_t>(ei);
+          const auto* e = view.edgeAt(best.edgeIdx);
+          best.fromNode = static_cast<int>(e->from_node());
+          best.toNode   = static_cast<int>(e->to_node());
           best.segIndex = k;
           best.t = t;
-          best.projLat = px;
-          best.projLon = py;
+          best.projLat = projLat;
+          best.projLon = projLon;
           best.dist_m = d;
         }
       }
@@ -97,19 +101,12 @@ struct Router::Impl {
     return best;
   }
 
-  struct NodeLabel {
-    double g{std::numeric_limits<double>::infinity()}; // стоимость от старта
-    int prevNode{-1};
-    uint32_t prevEdge{std::numeric_limits<uint32_t>::max()};
-  };
-
-  // Проверка доступа и направления
+  // --- утилиты доступа/веса ---
   static bool edgeAllowed(const Routing::Edge* e, Profile profile, int fromNode) {
     auto mask = e->access_mask();
     bool carOk  = (profile == Profile::Car)  && (mask & 1);
     bool footOk = (profile == Profile::Foot) && (mask & 2);
     if (!carOk && !footOk) return false;
-
     bool oneway = e->oneway();
     if (oneway && fromNode != static_cast<int>(e->from_node())) return false;
     return true;
@@ -121,7 +118,21 @@ struct Router::Impl {
     return e->length_m() / speed;
   }
 
-  // bi-A*: ограничение — в рамках одного тайла (см. TODO ниже)
+  // --- виртуальные рёбра/узлы для снапа ---
+  struct VirtualEdge {
+    int from{-1};
+    int to{-1};
+    double length_m{0.0};
+    double duration_s{0.0};
+    uint32_t access_mask{0};
+    bool oneway{false};
+    // простая геометрия (две точки), чтобы собрать polyline
+    Coord a{}, b{};
+    // индекс реального ребра в тайле, к которому относится виртуальный сегмент
+    int realEdgeIdx{-1};
+  };
+
+  // bi-A* внутри одного тайла + виртуальные узлы
   RouteResult routeSingleTile(Profile profile,
                               const TileKey& key,
                               TileView& view,
@@ -136,72 +147,174 @@ struct Router::Impl {
       return rr;
     }
 
-    // Выбираем "ближайший" узел к стартовой проекции: тот конец сегмента ребра, к которому ближе вдоль геометрии
+    // Построим виртуальные узлы
+    const int vStart = N;     // виртуальный узел старта
+    const int vEnd   = N + 1; // виртуальный узел финиша
+    const int VN     = N + 2; // общее число узлов в вычислении
+
     auto* eStart = view.edgeAt(startSnap.edgeIdx);
     auto* eEnd   = view.edgeAt(endSnap.edgeIdx);
 
-    // Для старта: если t<0.5 — ближе from_node, иначе to_node (грубо; можно интегрировать по длине сегмента)
-    int sNode = (startSnap.t <= 0.5) ? static_cast<int>(eStart->from_node()) : static_cast<int>(eStart->to_node());
-    // Для финиша — аналогично
-    int tNode = (endSnap.t  <= 0.5) ? static_cast<int>(eEnd->from_node())   : static_cast<int>(eEnd->to_node());
+    auto speedOf = [&](const Routing::Edge* e)->double {
+      return (profile == Profile::Car) ? e->speed_mps() : e->foot_speed_mps();
+    };
 
-    // Начальный/конечный оффсеты по ребру (часть ребра до/после проекции)
-    // Это позволит учесть «кусочки» ребра, которые мы не прошли
-    auto partialStartSec = [&] {
-      // время от реальной проекции до выбранного стартового узла
-      // если выбран from, то идём от проекции к from (доля t), иначе — к to (доля 1-t)
-      double frac = (sNode == static_cast<int>(eStart->from_node())) ? startSnap.t : (1.0 - startSnap.t);
-      return frac * edgeTraversalTimeSec(eStart, profile);
-    }();
-    auto partialEndSec = [&] {
-      // от выбранного "узла финиша" до фактической проекции (в конце маршрута)
-      double frac = (tNode == static_cast<int>(eEnd->from_node())) ? (1.0 - endSnap.t) : endSnap.t;
-      return frac * edgeTraversalTimeSec(eEnd, profile);
-    }();
+    // длины/времена долей ребра
+    auto lenStart  = eStart->length_m();
+    auto durStart  = (speedOf(eStart) > 0.0) ? (lenStart / speedOf(eStart)) : std::numeric_limits<double>::infinity();
+    auto tS = std::clamp(startSnap.t, 0.0, 1.0);
 
-    // Двунаправленный A*
+    auto lenEnd    = eEnd->length_m();
+    auto durEnd    = (speedOf(eEnd) > 0.0) ? (lenEnd / speedOf(eEnd)) : std::numeric_limits<double>::infinity();
+    auto tE = std::clamp(endSnap.t, 0.0, 1.0);
+
+    // Виртуальные рёбра для старта:
+    // 1) from -> vStart  (доля t)
+    // 2) vStart -> to    (доля 1-t)
+    VirtualEdge vs1{
+      startSnap.fromNode, vStart,
+      lenStart * tS,
+      durStart * tS,
+      eStart->access_mask(),
+      eStart->oneway(),
+      {view.nodeLat(startSnap.fromNode), view.nodeLon(startSnap.fromNode)},
+      {startSnap.projLat, startSnap.projLon},
+      static_cast<int>(startSnap.edgeIdx)
+    };
+    VirtualEdge vs2{
+      vStart, startSnap.toNode,
+      lenStart * (1.0 - tS),
+      durStart * (1.0 - tS),
+      eStart->access_mask(),
+      eStart->oneway(),
+      {startSnap.projLat, startSnap.projLon},
+      {view.nodeLat(startSnap.toNode), view.nodeLon(startSnap.toNode)},
+      static_cast<int>(startSnap.edgeIdx)
+    };
+
+    // Виртуальные рёбра для финиша:
+    // 1) from -> vEnd   (доля t)
+    // 2) vEnd  -> to    (доля 1-t)
+    VirtualEdge ve1{
+      endSnap.fromNode, vEnd,
+      lenEnd * tE,
+      durEnd * tE,
+      eEnd->access_mask(),
+      eEnd->oneway(),
+      {view.nodeLat(endSnap.fromNode), view.nodeLon(endSnap.fromNode)},
+      {endSnap.projLat, endSnap.projLon},
+      static_cast<int>(endSnap.edgeIdx)
+    };
+    VirtualEdge ve2{
+      vEnd, endSnap.toNode,
+      lenEnd * (1.0 - tE),
+      durEnd * (1.0 - tE),
+      eEnd->access_mask(),
+      eEnd->oneway(),
+      {endSnap.projLat, endSnap.projLon},
+      {view.nodeLat(endSnap.toNode), view.nodeLon(endSnap.toNode)},
+      static_cast<int>(endSnap.edgeIdx)
+    };
+
+    // Собираем список виртуальных рёбер (учитываем oneway: если oneway=true, vs1 допустим только from->vStart, a vStart->from не допускаем)
+    std::vector<VirtualEdge> virt;
+    virt.reserve(4);
+    virt.push_back(vs1);
+    virt.push_back(vs2);
+    virt.push_back(ve1);
+    virt.push_back(ve2);
+
+    // Мелкая утилита доступа к «исходящим» виртуальным рёбрам из узла u
+    auto virtOutEdges = [&](int u, std::vector<int>& outIdxs) {
+      outIdxs.clear();
+      for (int i = 0; i < static_cast<int>(virt.size()); ++i) {
+        if (virt[i].from == u) outIdxs.push_back(i);
+      }
+    };
+    // И входящие для обратного фронта
+    auto virtInEdges = [&](int u, std::vector<int>& outIdxs) {
+      outIdxs.clear();
+      for (int i = 0; i < static_cast<int>(virt.size()); ++i) {
+        if (virt[i].to == u) outIdxs.push_back(i);
+      }
+    };
+
+    // --- bi-A* между vStart и vEnd ---
     struct QNode { int v; double f; };
     struct Cmp { bool operator()(const QNode& a, const QNode& b) const { return a.f > b.f; } };
 
-    std::vector<NodeLabel> F(N), B(N);
-    auto hF = [&](int v)->double {
-      return haversine(view.nodeLat(v), view.nodeLon(v),
-                       view.nodeLat(tNode), view.nodeLon(tNode)) /
-             ((profile == Profile::Car) ? 13.9 : 1.4);
+    struct Label {
+      double g{std::numeric_limits<double>::infinity()};
+      int prevNode{-1};
+      uint32_t prevEdge{std::numeric_limits<uint32_t>::max()}; // индекс реального ребра (если брали real-edge)
+      int prevVirt{-1}; // индекс виртуального ребра (если брали виртуальный)
     };
-    auto hB = [&](int v)->double {
-      return haversine(view.nodeLat(v), view.nodeLon(v),
-                       view.nodeLat(sNode), view.nodeLon(sNode)) /
-             ((profile == Profile::Car) ? 13.9 : 1.4);
+
+    std::vector<Label> F(VN), B(VN);
+
+    auto speedHeur = (profile == Profile::Car) ? 13.9 : 1.4;
+    auto h = [&](int v, const Coord& target)->double {
+      double lv = (v < N) ? view.nodeLat(v) : (v == vStart ? startSnap.projLat : endSnap.projLat);
+      double lo = (v < N) ? view.nodeLon(v) : (v == vStart ? startSnap.projLon : endSnap.projLon);
+      return haversine(lv, lo, target.lat, target.lon) / speedHeur;
     };
 
     std::priority_queue<QNode, std::vector<QNode>, Cmp> pqF, pqB;
 
-    F[sNode].g = 0.0;
-    pqF.push({sNode, hF(sNode)});
+    Coord targetF{endSnap.projLat, endSnap.projLon};
+    Coord targetB{startSnap.projLat, startSnap.projLon};
 
-    B[tNode].g = 0.0;
-    pqB.push({tNode, hB(tNode)});
+    F[vStart].g = 0.0;
+    pqF.push({vStart, h(vStart, targetF)});
+
+    B[vEnd].g = 0.0;
+    pqB.push({vEnd, h(vEnd, targetB)});
 
     double bestMu = std::numeric_limits<double>::infinity();
     int meet = -1;
 
+    std::vector<int> tmpIdx;
+
     auto relaxForward = [&](int u) {
-      uint32_t start = view.firstEdge(u);
-      uint16_t cnt   = view.edgeCountFrom(u);
-      for (uint32_t k = 0; k < cnt; ++k) {
-        uint32_t ei = start + k;
-        const auto* e = view.edgeAt(ei);
-        if (!edgeAllowed(e, profile, u)) continue;
-        int v = static_cast<int>(e->to_node());
-        double w = edgeTraversalTimeSec(e, profile);
-        if (!std::isfinite(w)) continue;
-        double cand = F[u].g + w;
+      // 1) реальные исходящие рёбра
+      if (u < N) {
+        uint32_t start = view.firstEdge(u);
+        uint16_t cnt   = view.edgeCountFrom(u);
+        for (uint32_t k = 0; k < cnt; ++k) {
+          uint32_t ei = start + k;
+          const auto* e = view.edgeAt(ei);
+          if (!edgeAllowed(e, profile, u)) continue;
+          int v = static_cast<int>(e->to_node());
+          double w = edgeTraversalTimeSec(e, profile);
+          if (!std::isfinite(w)) continue;
+          double cand = F[u].g + w;
+          if (cand < F[v].g) {
+            F[v].g = cand;
+            F[v].prevNode = u;
+            F[v].prevEdge = ei;
+            F[v].prevVirt = -1;
+            pqF.push({v, cand + h(v, targetF)});
+            if (B[v].g < std::numeric_limits<double>::infinity()) {
+              double mu = cand + B[v].g;
+              if (mu < bestMu) { bestMu = mu; meet = v; }
+            }
+          }
+        }
+      }
+      // 2) виртуальные исходящие
+      virtOutEdges(u, tmpIdx);
+      for (int idx : tmpIdx) {
+        const auto& e = virt[idx];
+        // доступ/oneway — берём как есть, т.к. уже "направили" from→to
+        if (e.duration_s == std::numeric_limits<double>::infinity()) continue;
+        int v = e.to;
+        double cand = F[u].g + e.duration_s;
         if (cand < F[v].g) {
           F[v].g = cand;
           F[v].prevNode = u;
-          F[v].prevEdge = ei;
-          pqF.push({v, cand + hF(v)});
+          F[v].prevEdge = std::numeric_limits<uint32_t>::max();
+          F[v].prevVirt = idx;
+          pqF.push({v, cand + h(v, targetF)});
           if (B[v].g < std::numeric_limits<double>::infinity()) {
             double mu = cand + B[v].g;
             if (mu < bestMu) { bestMu = mu; meet = v; }
@@ -210,22 +323,43 @@ struct Router::Impl {
       }
     };
 
-    // Для обратного фронта используем inEdges (входящие)
     auto relaxBackward = [&](int u) {
-      const auto& inE = view.inEdgesOf(u);
-      for (auto ei : inE) {
-        const auto* e = view.edgeAt(ei);
-        int from = static_cast<int>(e->from_node());
-        // Проверяем доступ и направление "вперёд", но теперь у нас цель — прийти в 'from' из 'u'
-        if (!edgeAllowed(e, profile, from)) continue;
-        double w = edgeTraversalTimeSec(e, profile);
-        if (!std::isfinite(w)) continue;
-        double cand = B[u].g + w;
+      // 1) реальные входящие рёбра
+      if (u < N) {
+        const auto& inE = view.inEdgesOf(u);
+        for (auto ei : inE) {
+          const auto* e = view.edgeAt(ei);
+          int from = static_cast<int>(e->from_node());
+          if (!edgeAllowed(e, profile, from)) continue;
+          double w = edgeTraversalTimeSec(e, profile);
+          if (!std::isfinite(w)) continue;
+          double cand = B[u].g + w;
+          if (cand < B[from].g) {
+            B[from].g = cand;
+            B[from].prevNode = u;
+            B[from].prevEdge = ei;
+            B[from].prevVirt = -1;
+            pqB.push({from, cand + h(from, targetB)});
+            if (F[from].g < std::numeric_limits<double>::infinity()) {
+              double mu = cand + F[from].g;
+              if (mu < bestMu) { bestMu = mu; meet = from; }
+            }
+          }
+        }
+      }
+      // 2) виртуальные входящие
+      virtInEdges(u, tmpIdx);
+      for (int idx : tmpIdx) {
+        const auto& e = virt[idx];
+        if (e.duration_s == std::numeric_limits<double>::infinity()) continue;
+        int from = e.from;
+        double cand = B[u].g + e.duration_s;
         if (cand < B[from].g) {
           B[from].g = cand;
-          B[from].prevNode = u;         // в обратном графе "следующий" — это куда мы шли
-          B[from].prevEdge = ei;
-          pqB.push({from, cand + hB(from)});
+          B[from].prevNode = u;
+          B[from].prevEdge = std::numeric_limits<uint32_t>::max();
+          B[from].prevVirt = idx;
+          pqB.push({from, cand + h(from, targetB)});
           if (F[from].g < std::numeric_limits<double>::infinity()) {
             double mu = cand + F[from].g;
             if (mu < bestMu) { bestMu = mu; meet = from; }
@@ -238,127 +372,93 @@ struct Router::Impl {
     while (!pqF.empty() || !pqB.empty()) {
       if (!pqF.empty()) {
         auto q = pqF.top(); pqF.pop();
-        if (F[q.v].g + hF(q.v) > bestMu) break; // прекращаем, если уже хуже, чем лучший
+        if (F[q.v].g + h(q.v, targetF) > bestMu) break;
         relaxForward(q.v);
       }
       if (!pqB.empty()) {
         auto q = pqB.top(); pqB.pop();
-        if (B[q.v].g + hB(q.v) > bestMu) break;
+        if (B[q.v].g + h(q.v, targetB) > bestMu) break;
         relaxBackward(q.v);
       }
     }
 
-    if (meet < 0 && sNode != tNode) {
+    if (meet < 0 && vStart != vEnd) {
       rr.status = RouteStatus::NO_ROUTE;
       rr.error_message = "no path within tile";
       return rr;
     }
 
-    // Восстановление пути: sNode -> meet по F, meet -> tNode по B (назад)
-    std::vector<uint32_t> pathEdges;
-    auto v = meet;
-    // вперёд
-    while (v != sNode && v >= 0) {
-      auto pe = F[v].prevEdge;
-      if (pe == std::numeric_limits<uint32_t>::max()) break;
-      pathEdges.push_back(pe);
-      v = F[v].prevNode;
-    }
-    std::reverse(pathEdges.begin(), pathEdges.end());
-    // назад (из meet до tNode по B)
-    v = meet;
-    while (v != tNode && v >= 0) {
-      auto pe = B[v].prevEdge;
-      if (pe == std::numeric_limits<uint32_t>::max()) break;
-      // pe ведёт из 'from' -> v, нам нужно добавить его в прямом направлении
-      // Он уже ориентирован from->to, а мы шли к v, так что нужно добавить именно pe, но порядок точек будет корректен при сборке polyline
-      pathEdges.push_back(pe);
-      v = B[v].prevNode;
-    }
+    // Восстановление пути: vStart -> meet по F, meet -> vEnd по B
+    std::vector<std::pair<bool,uint64_t>> used; // (isVirt, id/edgeIdx)
+    auto pushForward = [&](int v) {
+      while (v != vStart && v >= 0) {
+        if (F[v].prevVirt >= 0) {
+          used.emplace_back(true, static_cast<uint64_t>(F[v].prevVirt));
+        } else {
+          used.emplace_back(false, static_cast<uint64_t>(F[v].prevEdge));
+        }
+        v = F[v].prevNode;
+      }
+    };
+    auto pushBackward = [&](int v) {
+      while (v != vEnd && v >= 0) {
+        if (B[v].prevVirt >= 0) {
+          used.emplace_back(true, static_cast<uint64_t>(B[v].prevVirt));
+        } else {
+          used.emplace_back(false, static_cast<uint64_t>(B[v].prevEdge));
+        }
+        v = B[v].prevNode;
+      }
+    };
 
-    // Сборка polyline: учесть частичные сегменты старта/финиша
+    pushForward(meet);
+    std::reverse(used.begin(), used.end());
+    pushBackward(meet);
+
+    // Сборка polyline и метрик
     rr.polyline.clear();
     rr.edge_ids.clear();
     rr.distance_m = 0.0;
     rr.duration_s = 0.0;
 
-    // Стартовый частичный отрезок (от проекции до sNode)
-    {
-      std::vector<std::pair<double,double>> tmp;
-      view.appendEdgeShape(startSnap.edgeIdx, tmp, /*skipFirst*/false);
-      if (tmp.size() >= 2) {
-        // построим от точки проекции к выбранному узлу
-        // найдем пару точек сегмента startSnap.segIndex
-        auto a = tmp[startSnap.segIndex];
-        auto b = tmp[startSnap.segIndex+1];
-        std::pair<double,double> P{startSnap.projLat, startSnap.projLon};
-        // если sNode == from, идём P->a, иначе P->b
-        std::vector<std::pair<double,double>> part;
-        if (sNode == static_cast<int>(view.edgeAt(startSnap.edgeIdx)->from_node())) {
-          part.push_back(P); part.push_back(a);
-        } else {
-          part.push_back(P); part.push_back(b);
-        }
-        // добавить в итог (пересчитать длину/время)
-        if (!rr.polyline.empty() && rr.polyline.back().lat == part.front().first && rr.polyline.back().lon == part.front().second) {
-          // ok
-        }
-        for (size_t i=0;i<part.size();++i) {
-          if (i==0 && !rr.polyline.empty() &&
-              rr.polyline.back().lat == part[i].first && rr.polyline.back().lon == part[i].second) continue;
-          rr.polyline.push_back(Coord{part[i].first, part[i].second});
-          if (i>0) rr.distance_m += haversine(part[i-1].first, part[i-1].second, part[i].first, part[i].second);
-        }
-        rr.duration_s += partialStartSec;
+    auto appendPoint = [&](double lat, double lon) {
+      if (!rr.polyline.empty()) {
+        auto& last = rr.polyline.back();
+        if (last.lat == lat && last.lon == lon) return;
+        rr.distance_m += haversine(last.lat, last.lon, lat, lon);
       }
-    }
+      rr.polyline.push_back(Coord{lat, lon});
+    };
 
-    // Основные рёбра пути
-    for (auto ei : pathEdges) {
-      rr.edge_ids.push_back(makeEdgeId(key.z, key.x, key.y, ei));
-      std::vector<std::pair<double,double>> pts;
-      view.appendEdgeShape(ei, pts, /*skipFirst*/rr.polyline.size()>0);
-      // добавить точки
-      for (auto& p : pts) {
-        // исключаем дубли
-        if (!rr.polyline.empty() &&
-            rr.polyline.back().lat == p.first &&
-            rr.polyline.back().lon == p.second) {
-          continue;
-        }
-        if (!rr.polyline.empty()) {
-          rr.distance_m += haversine(rr.polyline.back().lat, rr.polyline.back().lon, p.first, p.second);
-        }
-        rr.polyline.push_back(Coord{p.first, p.second});
-      }
-      rr.duration_s += edgeTraversalTimeSec(view.edgeAt(ei), profile);
-    }
-
-    // Конечный частичный отрезок (от узла tNode до проекции)
-    {
-      std::vector<std::pair<double,double>> tmp;
-      view.appendEdgeShape(endSnap.edgeIdx, tmp, /*skipFirst*/false);
-      if (tmp.size() >= 2) {
-        auto a = tmp[endSnap.segIndex];
-        auto b = tmp[endSnap.segIndex+1];
-        std::pair<double,double> P{endSnap.projLat, endSnap.projLon};
-        std::vector<std::pair<double,double>> part;
-        if (tNode == static_cast<int>(view.edgeAt(endSnap.edgeIdx)->from_node())) {
-          part.push_back(a); part.push_back(P);
-        } else {
-          part.push_back(b); part.push_back(P);
-        }
-        // добавить
-        for (size_t i=0;i<part.size();++i) {
-          // исключить дубли
-          if (!rr.polyline.empty()) {
-            auto& last = rr.polyline.back();
-            if (last.lat == part[i].first && last.lon == part[i].second && i==0) continue;
-            rr.distance_m += haversine(last.lat, last.lon, part[i].first, part[i].second);
+    uint64_t lastEdgeIdPushed = std::numeric_limits<uint64_t>::max();
+    for (auto [isVirt, id] : used) {
+      if (isVirt) {
+        const auto& e = virt[static_cast<int>(id)];
+        // Виртуальные рёбра добавляем геометрией двух точек
+        if (rr.polyline.empty()) appendPoint(e.a.lat, e.a.lon);
+        else appendPoint(e.a.lat, e.a.lon); // возможно совпадёт и просто не добавится
+        appendPoint(e.b.lat, e.b.lon);
+        rr.duration_s += e.duration_s;
+        // Добавим соответствующий реальный edgeId (избегая дублей подряд)
+        if (e.realEdgeIdx >= 0) {
+          uint64_t eid = makeEdgeId(key.z, key.x, key.y, static_cast<uint32_t>(e.realEdgeIdx));
+          if (eid != lastEdgeIdPushed) {
+            rr.edge_ids.push_back(eid);
+            lastEdgeIdPushed = eid;
           }
-          rr.polyline.push_back(Coord{part[i].first, part[i].second});
         }
-        rr.duration_s += partialEndSec;
+      } else {
+        uint32_t ei = static_cast<uint32_t>(id);
+        // Реальное ребро: добавляем его shape
+        std::vector<std::pair<double,double>> pts;
+        view.appendEdgeShape(ei, pts, /*skipFirst*/!rr.polyline.empty());
+        for (auto& p : pts) appendPoint(p.first, p.second);
+        rr.duration_s += edgeTraversalTimeSec(view.edgeAt(ei), profile);
+        uint64_t eid = makeEdgeId(key.z, key.x, key.y, ei);
+        if (eid != lastEdgeIdPushed) {
+          rr.edge_ids.push_back(eid);
+          lastEdgeIdPushed = eid;
+        }
       }
     }
 
@@ -381,7 +481,7 @@ RouteResult Router::route(Profile profile, const std::vector<Coord>& waypoints) 
     return rr;
   }
 
-  // Пока — требуем, чтобы все точки были в одном тайле (ограничение текущей схемы).
+  // В v1 — все точки должны быть в одном тайле
   auto key0 = webTileKeyFor(waypoints.front().lat, waypoints.front().lon, impl_->tileZoom);
   for (size_t i=1;i<waypoints.size();++i) {
     auto ki = webTileKeyFor(waypoints[i].lat, waypoints[i].lon, impl_->tileZoom);
@@ -399,12 +499,10 @@ RouteResult Router::route(Profile profile, const std::vector<Coord>& waypoints) 
     rr.status = RouteStatus::NO_ROUTE; rr.error_message = "empty tile"; return rr;
   }
 
-  // строим последовательно по сегментам waypoints[i] -> waypoints[i+1]
   RouteResult total;
   total.status = RouteStatus::OK;
 
   for (size_t i=0;i+1<waypoints.size();++i) {
-    // snap start/end к ребру
     auto sSnap = Impl::snapToEdge(view, waypoints[i].lat,   waypoints[i].lon);
     auto tSnap = Impl::snapToEdge(view, waypoints[i+1].lat, waypoints[i+1].lon);
     if (!sSnap || !tSnap) {
@@ -416,22 +514,23 @@ RouteResult Router::route(Profile profile, const std::vector<Coord>& waypoints) 
     auto segRes = impl_->routeSingleTile(profile, TileKey{key0.z,key0.x,key0.y}, view, *sSnap, *tSnap);
     if (segRes.status != RouteStatus::OK) return segRes;
 
-    // конкатенация результатов
     if (i == 0) {
-      total = segRes;
+      total = std::move(segRes);
     } else {
-      // склеить polyline без дублирования
+      // Склейка без дублирования
       if (!total.polyline.empty() && !segRes.polyline.empty()) {
         auto& last = total.polyline.back();
         auto& first = segRes.polyline.front();
         if (last.lat == first.lat && last.lon == first.lon) {
-          // уже совпадают
+          // ок, просто сшиваем
         } else {
-          // добавить соединяющую точку (обычно совпадёт)
+          total.polyline.push_back(first);
         }
       }
-      total.polyline.insert(total.polyline.end(), segRes.polyline.begin() + (total.polyline.empty() ? 0 : 1), segRes.polyline.end());
-      total.distance_m += segRes.distance_m;
+      total.polyline.insert(total.polyline.end(),
+                            segRes.polyline.begin() + (segRes.polyline.empty()?0:1),
+                            segRes.polyline.end());
+      total.distance_m += segRes.distance_m; // segRes.distance_m уже посчитана в сборке polyline
       total.duration_s += segRes.duration_s;
       total.edge_ids.insert(total.edge_ids.end(), segRes.edge_ids.begin(), segRes.edge_ids.end());
     }

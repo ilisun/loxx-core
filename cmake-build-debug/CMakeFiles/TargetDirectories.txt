@@ -1,0 +1,11 @@
+/Users/borovinsky.in/dev/LoxxCore/cmake-build-debug/CMakeFiles/edit_cache.dir
+/Users/borovinsky.in/dev/LoxxCore/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/Users/borovinsky.in/dev/LoxxCore/cmake-build-debug/core/CMakeFiles/routing_core.dir
+/Users/borovinsky.in/dev/LoxxCore/cmake-build-debug/core/CMakeFiles/core_generate_fbs.dir
+/Users/borovinsky.in/dev/LoxxCore/cmake-build-debug/core/CMakeFiles/route_demo.dir
+/Users/borovinsky.in/dev/LoxxCore/cmake-build-debug/core/CMakeFiles/edit_cache.dir
+/Users/borovinsky.in/dev/LoxxCore/cmake-build-debug/core/CMakeFiles/rebuild_cache.dir
+/Users/borovinsky.in/dev/LoxxCore/cmake-build-debug/converter/CMakeFiles/generate_flatbuffers.dir
+/Users/borovinsky.in/dev/LoxxCore/cmake-build-debug/converter/CMakeFiles/converter.dir
+/Users/borovinsky.in/dev/LoxxCore/cmake-build-debug/converter/CMakeFiles/edit_cache.dir
+/Users/borovinsky.in/dev/LoxxCore/cmake-build-debug/converter/CMakeFiles/rebuild_cache.dir

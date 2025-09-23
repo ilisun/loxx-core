@@ -29,8 +29,7 @@ public:
   TileStore(const std::string& db_path, size_t cacheCapacity);
   ~TileStore();
 
-  // Загружает BLOB тайла по ключу (LRU-кэш).
-  // Возвращает nullptr при отсутствии.
+  // Загружает BLOB тайла по ключу (LRU-кэш). nullptr при отсутствии.
   std::shared_ptr<TileBlob> load(int z, int x, int y);
 
   int zoom() const { return zoom_; }
@@ -45,7 +44,6 @@ private:
   };
 
   std::shared_ptr<TileBlob> loadFromDb(int z, int x, int y);
-  void touchLRU(const TileKey& key);
   void insertLRU(const TileKey& key, std::shared_ptr<TileBlob> blob);
 
 private:

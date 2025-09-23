@@ -10,7 +10,6 @@ TileStore::TileStore(const std::string& db_path, size_t cacheCapacity)
   if (sqlite3_open(db_path.c_str(), &db_) != SQLITE_OK) {
     throw std::runtime_error(std::string("Failed to open routingdb: ") + sqlite3_errmsg(db_));
   }
-  // Чуть лучше поведение на чтение
   sqlite3_exec(db_, "PRAGMA journal_mode=WAL;", nullptr, nullptr, nullptr);
   sqlite3_exec(db_, "PRAGMA synchronous=NORMAL;", nullptr, nullptr, nullptr);
   sqlite3_exec(db_, "PRAGMA temp_store=MEMORY;", nullptr, nullptr, nullptr);
@@ -22,7 +21,6 @@ TileStore::~TileStore() {
 
 std::shared_ptr<TileBlob> TileStore::load(int z, int x, int y) {
   TileKey key{z,x,y};
-  // hit?
   auto it = map_.find(key);
   if (it != map_.end()) {
     // move to front
@@ -66,21 +64,9 @@ std::shared_ptr<TileBlob> TileStore::loadFromDb(int z, int x, int y) {
   return out;
 }
 
-void TileStore::touchLRU(const TileKey& key) {
-  auto it = map_.find(key);
-  if (it == map_.end()) return;
-  lru_.erase(it->second.it);
-  lru_.push_front(key);
-  it->second.it = lru_.begin();
-}
-
 void TileStore::insertLRU(const TileKey& key, std::shared_ptr<TileBlob> blob) {
-  if (capacity_ == 0) {
-    // без кэша
-    return;
-  }
+  if (capacity_ == 0) return;
   if (lru_.size() >= capacity_) {
-    // evict last
     auto last = lru_.back();
     lru_.pop_back();
     map_.erase(last);

@@ -27,12 +27,12 @@ struct RouteResult {
   std::vector<Coord> polyline;        // геометрия маршрута
   double distance_m {0.0};            // суммарная длина
   double duration_s {0.0};            // суммарное время (сек)
-  std::vector<uint64_t> edge_ids;     // идентификаторы рёбер маршрута
+  std::vector<uint64_t> edge_ids;     // идентификаторы реальных рёбер маршрута (без виртуальных)
   std::string error_message;          // описание ошибки (опц.)
 };
 
 struct RouterOptions {
-  int tileZoom = 14;                  // уровень тайла (должен совпадать с конвертером)
+  int tileZoom = 14;                  // уровень тайла (совпадает с конвертером)
   size_t tileCacheCapacity = 128;     // LRU-кэш тайлов
 };
 
@@ -41,7 +41,7 @@ public:
   explicit Router(const std::string& db_path, RouterOptions opt = {});
   ~Router();
 
-  // Маршрут через start..waypoints..end
+  // Маршрут через start..waypoints..end (в v1 — все точки в одном тайле)
   RouteResult route(Profile profile, const std::vector<Coord>& waypoints);
 
 private:
