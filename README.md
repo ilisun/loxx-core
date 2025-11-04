@@ -1,4 +1,4 @@
-# LoxxCore — Offline/Online Routing Core на данных OpenStreetMap
+# LoxxCore — C++ Offline/Online Routing Engine на данных OpenStreetMap
 
 Кроссплатформенное ядро маршрутизации (C++20) с поддержкой оффлайн‑пакетов и онлайн‑API.
 
@@ -13,6 +13,31 @@
 - Спецификация: `docs/main_spec.md`
 - Дорожная карта: `docs/plan.md`
 - Задача 1 (конвертер PBF → routingdb): `docs/it_1_task_1.md`
+
+## 🎯 Использование
+
+### iOS
+
+См. [loxx-router-ios](https://github.com/ilisun/loxx-router-ios) для Swift API
+
+### Android (Coming soon)
+
+См. [loxx-router-android](https://github.com/ilisun/loxx-router-android)
+
+### CLI Converter
+
+```bash
+cmake -S . -B build
+cmake --build build
+./build/converter/converter --z 14 input.osm.pbf output.routingdb
+```
+
+## 📦 Releases
+
+Каждый релиз включает:
+
+- `LoxxCore.xcframework.zip` — iOS binary
+- `converter` — CLI tool (macOS/Linux)
 
 ## Быстрый старт (конвертер)
 
