@@ -1,0 +1,90 @@
+name: Build iOS XCFramework
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-xcframework:
+    runs-on: macos-14  # macOS с Apple Silicon
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '15.2'
+      
+      - name: Install dependencies
+        run: |
+          brew install cmake sqlite3
+      
+      - name: Make build script executable
+        run: chmod +x scripts/build-ios-framework.sh
+      
+      - name: Build XCFramework
+        run: ./scripts/build-ios-framework.sh
+      
+      - name: Compute checksum
+        id: checksum
+        run: |
+          cd releases
+          CHECKSUM=$(swift package compute-checksum LoxxCore.xcframework.zip)
+          echo "checksum=$CHECKSUM" >> $GITHUB_OUTPUT
+          echo "Checksum: $CHECKSUM"
+      
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref_name }}
+          release_name: LoxxCore ${{ github.ref_name }}
+          body: |
+            ## LoxxCore C++ Routing Engine
+            
+            ### 📦 iOS XCFramework
+            
+            **Checksum for Package.swift:**
+            ```swift
+            .binaryTarget(
+                name: "LoxxCore",
+                url: "https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/LoxxCore.xcframework.zip",
+                checksum: "${{ steps.checksum.outputs.checksum }}"
+            )
+            ```
+            
+            ### 🎯 Supported Platforms
+            - iOS 13.0+
+            - iOS Simulator (arm64 + x86_64)
+            
+            ### 📚 Documentation
+            See [loxx-router-ios](https://github.com/ilisun/loxx-router-ios) for Swift API
+          draft: false
+          prerelease: false
+      
+      - name: Upload XCFramework ZIP
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./releases/LoxxCore.xcframework.zip
+          asset_name: LoxxCore.xcframework.zip
+          asset_content_type: application/zip
+      
+      - name: Comment checksum on commit
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.repos.createCommitComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              commit_sha: context.sha,
+              body: `## ✅ XCFramework Built Successfully\n\n**Checksum:** \`${{ steps.checksum.outputs.checksum }}\`\n\nUse this in loxx-router-ios Package.swift`
+            })
+
