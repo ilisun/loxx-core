@@ -40,7 +40,7 @@ NSErrorDomain const LoxxRouterErrorDomain = @"com.loxx.router";
             if (error) {
                 NSString *desc = [NSString stringWithUTF8String:e.what()];
                 *error = [NSError errorWithDomain:LoxxRouterErrorDomain
-                                             code:LoxxRouterErrorCodeInternalError
+                                             code:LoxxRouterErrorCodeInternal
                                          userInfo:@{NSLocalizedDescriptionKey: desc}];
             }
             return nil;
@@ -56,7 +56,7 @@ NSErrorDomain const LoxxRouterErrorDomain = @"com.loxx.router";
     if (!_router) {
         if (error) {
             *error = [NSError errorWithDomain:LoxxRouterErrorDomain
-                                         code:LoxxRouterErrorCodeInternalError
+                                         code:LoxxRouterErrorCodeInternal
                                      userInfo:@{NSLocalizedDescriptionKey: @"Router not initialized"}];
         }
         return nil;
@@ -80,7 +80,7 @@ NSErrorDomain const LoxxRouterErrorDomain = @"com.loxx.router";
         if (result.status != routing_core::RouteStatus::OK) {
             if (error) {
                 NSString *desc = @"Unknown error";
-                LoxxRouterErrorCode code = LoxxRouterErrorCodeInternalError;
+                LoxxRouterErrorCode code = LoxxRouterErrorCodeInternal;
                 
                 switch (result.status) {
                     case routing_core::RouteStatus::NO_ROUTE:
@@ -128,7 +128,7 @@ NSErrorDomain const LoxxRouterErrorDomain = @"com.loxx.router";
         if (error) {
             NSString *desc = [NSString stringWithUTF8String:e.what()];
             *error = [NSError errorWithDomain:LoxxRouterErrorDomain
-                                         code:LoxxRouterErrorCodeInternalError
+                                         code:LoxxRouterErrorCodeInternal
                                      userInfo:@{NSLocalizedDescriptionKey: desc}];
         }
         return nil;
